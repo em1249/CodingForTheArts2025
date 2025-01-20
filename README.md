@@ -1,2 +1,0 @@
-# CodingForTheArts2025
- 
