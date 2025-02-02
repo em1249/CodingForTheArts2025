@@ -7,7 +7,6 @@ let bwLibrarianXPos = 50; // variable for position on x axis
 let bwLibrarianYPos = 100; // variable for position on y axis
 let bwLibrarianHitPoints = 10; // variable for hitpoints
 
-
 let pinkLibrarian //variable to contain object
 let pinkLibrarianSprite // variable to contain sprite
 let pinkLibrarianXPos = 200; // variable for position on x axis
