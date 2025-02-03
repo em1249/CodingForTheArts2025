@@ -42,10 +42,10 @@ function mouseClicked() {
     
 }
 
-class Dialogue {
-    constructor(text, xPos, yPos) {
-        this.text = text;
-        this.xPos = xPos;
+class Dialogue { //Constructing a class
+    constructor(text, xPos, yPos) { //The constructor takes some variables when we create an instance of this class in setup()...
+        this.text = text; //... and then creates a variable inside the instance of the class (which is instantiated as an object).
+        this.xPos = xPos; //this. says "create a variable called xPos and store the value passed to the constructor as xPos inside it"
         this.yPos = yPos;
     }
 }
