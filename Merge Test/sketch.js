@@ -145,6 +145,8 @@ function preload() {
 function setup() {
     createCanvas(500, 500);
 
+    player = new Player(playerSprite, 3, 3, tileSize, tileRules);
+
     //Load Graphic Data
     loadLevel();
 
