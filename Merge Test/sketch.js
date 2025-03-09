@@ -1,3 +1,8 @@
+//INTIALISE PLAYER VARIABLES
+let player;
+let playerSprite;
+let playerSpeed = 5;
+
 //INITIALISE TILEMAP VARIABLES
 let tileMap = []; //This is an array we will store our tiles in later
 let tilesX = 10; //This will be how many tiles there will be on the x axis (horizontally)
@@ -174,6 +179,19 @@ function draw() {
             //tileMap[tileX][tileY].debugGrid();
         }
     }
+
+    if (player.transition) { 
+        //CALLED ONCE PER FRAME: first checks if count is equal to countMax.
+        //If it is, it sets player.transition to false
+        //Otherwise, it simply adds 1 to count! This repeats until count is same as countMax!
+        if (count === countMax) player.transition = false; 
+        else count++;                          
+    }
+
+    player.display();
+    player.setDirection();
+    player.move();
+
 }
 
 class Tile{
@@ -225,3 +243,145 @@ class Tile{
         text("Accessed!", this.xPos + xPadding, this.yPos + yPadding)
     }
 }
+
+class Player{
+    constructor(sprite, startX, startY, tileSize, tileRules) {
+        //PLAYER SPRITES
+        this.sprite = sprite;
+
+        //TILE POSITION DATA
+        this.tileX = startX,
+        this.tileY = startY,
+
+        //PIXEL POSITION DATA
+        this.xPos = startX * tileSize;
+        this.yPos = startY * tileSize;
+
+        //DIRECTION PLAYER WANTS TO MOVE
+        this.dirX = 0;
+        this.dirY = 0;
+
+        //PLAYER'S TARGET PIXEL POSITION
+        this.tx = this.xPos;
+        this.ty = this.yPos;
+        
+        //MOVEMENT
+        this.isMoving = false;
+        this.transition = false;
+        this.speed = 5;
+
+        //TILE DATA
+        this.tileSize = tileSize;
+        this.tileRules = tileRules;
+        this.transition = false
+    }
+
+    display() {
+        image(this.sprite, this.xPos, this.yPos, this.tileSize, this.tileSize)
+    }
+
+    setDirection() {
+        //Variables for the keycode for keyIsDown
+        let up = 87;        //w
+        let down = 83       //s
+        let left = 65;      //a
+        let right = 68;     //d
+
+        if (!this.isMoving) { //CHECK IF PLAYER IS CURRENT MOVING, IF NOT, RUN THE CODE BELOW:
+
+            if (keyIsDown(up)) {
+                this.dirX = 0;
+                this.dirY = -1;
+            }
+
+            if (keyIsDown(down)) {
+                this.dirX = 0;
+                this.dirY = 1;
+            }
+
+            if (keyIsDown(left)) {
+                this.dirX = -1;
+                this.dirY = 0;
+            }
+
+            if (keyIsDown(right)) {
+                this.dirX = 1;
+                this.dirY = 0;
+            }
+
+            this.checkTargetTile()
+            
+        }
+    }
+
+    checkTargetTile() {
+        if (this.transition) {
+            this.dirX = 0;
+            this.dirY = 0;
+        }
+
+        //Calculate tile position of currentTile
+        this.tileX = Math.floor(this.xPos / this.tileSize);
+        this.tileY = Math.floor(this.yPos / this.tileSize);
+
+        //Calculate tile coordinates of next Tile;
+        let nextTileX = this.tileX + this.dirX;
+        let nextTileY = this.tileY + this.dirY;
+
+        //Check if nextTileX and nextTileY are both inbounds
+        //Remember && means AND (i.e. if ALL conditions are true)
+        if (nextTileX >= 0 &&       //left side of map
+            nextTileX < tilesX &&   //right side of map
+            nextTileY >= 0 &&       //top of map
+            nextTileY < tilesY) {  //bottom of map 
+
+            if (tileRules[nextTileY][nextTileX] === 2) { //Check for Transition Tile
+                currentLevel++;
+                
+                if (currentLevel >= levels.length) currentLevel = 0; //Checks if currentLevel is out of range, if so, sets to 0
+                
+                loadLevel(); //Loads the next level in our levels array
+                
+                //Set Player Start Position
+                this.setPlayerPosition();
+                count = 0;
+                this.transition = true;
+            }
+                
+            //Check if next tile is NOT walkable
+            else if (tileRules[nextTileY][nextTileX] != 1) { //!= means IS NOT
+                //If walkable, set tx and ty (pixel postiions)
+                this.tx = nextTileX * tileSize;
+                this.ty = nextTileY * tileSize;
+
+                //set this.isMoving to true to start Movement
+                this.isMoving = true;
+            }
+        }
+    }
+
+    move() {
+        //This is in our draw loop, so called move() is called every frame BUT...
+        if (this.isMoving) {
+            //this code block will only activate when this.isMoving = true. Otherwise, nothing happens.
+            //So first, start by moving in direction set by setDirection()
+            this.xPos += this.speed * this.dirX;
+            this.yPos += this.speed * this.dirY;
+
+            //Now check if player has reached targetX
+            if (this.xPos === this.tx && this.yPos === this.ty) {
+                //if there, stop moving and reset our variables
+                this.isMoving = false;
+                this.dirX = 0;
+                this.dirY = 0;
+            }
+        }
+    }
+
+    setPlayerPosition() {
+        this.tileX = levels[currentLevel].startTileX;
+        this.tileY = levels[currentLevel].startTileY;
+        this.xPos = levels[currentLevel].startTileX * tileSize;
+        this.yPos = levels[currentLevel].startTileY * tileSize;
+    }
+} //End of Player Class
