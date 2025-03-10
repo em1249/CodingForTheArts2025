@@ -61,11 +61,16 @@ let tileRules = [
 function preload() {
     textures[0] = loadImage("grassy.png");
     textures[1] = loadImage("stone.png");
-
+    
+    //CHANGED: I put all my sprites into an object called playerSprites and then each direction is an array.
+    //each direction has its own sprites for when walking. Sprite at index 0 is default when still. Any further sprites
+    //will be shown in the order they are placed in the array. You could have a default sprite and a seperate walking animation
+    //if you wanted, but you would need to modify how my animation code calls a specific index.
     playerSprites.up = [loadImage("art/starmer_up.png")];
     playerSprites.down = [loadImage("art/starmer_down.png")];
     playerSprites.left = [loadImage("art/starmer_left.png"), loadImage("art/starmer_walk_left.png")];
-    playerSprites.right = [loadImage("art/starmer_right.png"), loadImage("art/starmer_walk_right.png")];
+    playerSprites.right = [loadImage("art/starmer_right.png"), loadImage("art/starmer_walk_right.png")]; 
+
 }
 
 function setup() {
