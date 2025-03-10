@@ -10,8 +10,10 @@ let tilesY = 10; //This will be how many tiles there will be on the y axis (vert
 let tileSize = 50; //How many pixels across each tile will be.
 let textures = []; //value to store our textures for the graphics Map
 
-let lastSwitchTime;
-let timerMax = 200;
+//TIMER
+let lastCount;
+let timerMax = 10;
+let count = 0;
 
 
 //SETS GRAPHIC TO DISPLAY AT EACH TILE ON SCREEN
@@ -57,11 +59,11 @@ function preload() {
     playerSprites.up = [loadImage("art/starmer_up.png")];
     playerSprites.down = [loadImage("art/starmer_down.png")];
     playerSprites.left = [loadImage("art/starmer_left.png"), loadImage("art/starmer_walk_left.png")];
-    playerSprites.right = [loadImage("art/starmer_right.png")];
+    playerSprites.right = [loadImage("art/starmer_right.png"), loadImage("art/starmer_walk_right.png")];
 }
 
 function setup() {
-    lastSwitchTime = millis();
+    lastCount = count;
 
     noSmooth();
 
@@ -95,17 +97,22 @@ function draw() {
         }
     }
 
-    player.manageAnimation();
+    
     player.setDirection();
     player.move();
+    player.animateSprite();
+    player.display();
+
+    count++; //NEW
 }
 
 class Player{
     constructor(sprites, startX, startY, tileSize, tileRules) {
         //PLAYER SPRITES
-        this.sprites = sprites;
-        this.spriteDirection = this.sprites.down;
-        this.spriteIndex = 0;
+        this.sprites = sprites; //CHANGED: Sprite is now an object called sprites, containing each direction as an array.
+        this.spriteDirection = this.sprites.down; //CHANGED: Each direction now has an array associated with it
+        this.spriteIndex = 0; //CHANGED: This is the index of the sprite in each array that will actually display. 
+        this.animation = false;
 
         //TILE POSITION DATA
         this.tileX = startX,
@@ -133,6 +140,8 @@ class Player{
     }
 
     display() {
+        //CHANGED: So now, display checks waht the current direction is, gets taht array, and then displays whatever sprite is at the same
+        //index as this.spriteIndex
         noSmooth();
         image(this.spriteDirection[this.spriteIndex], this.xPos, this.yPos, this.tileSize, this.tileSize)
     }
@@ -149,7 +158,7 @@ class Player{
             if (keyIsDown(up)) {
                 this.dirX = 0;
                 this.dirY = -1;
-                this.spriteDirection = this.sprites.up;
+                this.spriteDirection = this.sprites.up; //CHANGED: Grab the array associated with each direction
             }
 
             if (keyIsDown(down)) {
@@ -196,13 +205,27 @@ class Player{
                 this.tx = nextTileX * tileSize;
                 this.ty = nextTileY * tileSize;
 
+                if (this.tileX === nextTileX && this.tileY === nextTileY) {
+                    this.isMoving = false; //CHANGED: I added this as I noticed that our current code technially will set isMoving to true for one
+                }
+                else {
                 //set this.isMoving to true to start Movement
-                this.isMoving = true;
+                    this.isMoving = true;
+                }
+
+
             }
+        } else {
+            this.dirX = 0;
+            this.dirY = 0;
         }
     }
 
     move() {
+        //CHANGED: added new variables here to get current xPos and yPos and storing it.
+        let lastXPos = this.xPos;
+        let lastYPos = this.yPos;
+
         //This is in our draw loop, so called move() is called every frame BUT...
         if (this.isMoving) {
             //this code block will only activate when this.isMoving = true. Otherwise, nothing happens.
@@ -218,29 +241,37 @@ class Player{
                 this.dirY = 0;
             }
         }
+
+        /*CHANGED
+        In the new version, I store the values of xPos and yPos BEFORE the 'if (this.isMoving)' statement is called. The 
+        'if (this.isMoving)' code block is what actually changes the value of xPos and yPos, so now we can check if that if statement
+        has been called and therefore if xPos and yPos have been changed. If it has, it will set our new bool ('this.animation') to true
+        as the character is currently moving. If they're the same, it's false.
+
+        We could tie this to this.isMoving, but this causes animation errors due to how the movement code works. So technically, this code
+        is handling animation purely based on whetehr xPos or yPos have changed between the start and end of the move() function.
+        */
+
+        if (lastXPos != this.xPos || lastYPos != this.yPos) {
+            this.animation = true; //if xPos and yPos have changed during move, start animation (as player is moving)
+        }
+        else {
+            this.animation = false; //if xPos and yPos are the same at the start and end move, stop animation (as player is not moving)
+        }
     }
 
-    manageAnimation() {
-        
-        if (millis() - lastSwitchTime > timerMax) {
-            console.log("called")
-            lastSwitchTime = millis();
-            this.spriteIndex = this.spriteIndex + 1
-
-            if (this.spriteIndex >= this.spriteDirection.length) {
-                this.spriteIndex = 0;
+    animateSprite() { //CHANGED: NEW FUNCTION!
+        //If animation is true, it starts our timer, and implements this.spriteIndex every 10 frames.
+        if (this.animation) {
+            if (count - lastCount >= timerMax) {
+                lastCount = count;
+                this.spriteIndex++;
+                if (this.spriteIndex >= this.spriteDirection.length) this.spriteIndex = 0; //this checks if this.spriteIndex is bigger than the direciotn array
             }
         }
-
-        if (this.dirX === 0 && this.dirY === 0) this.spriteIndex = 0;
-
-        console.log(this.spriteIndex)
-
-
-
-        
-
-        this.display();
+        else { //if this.animation = false, it sets our sprite back to 0.
+            this.spriteIndex = 0;
+        }
     }
 }
 
