@@ -1,3 +1,9 @@
+/* NOTES
+This code adds some animation to our player. Currently, it is only on the left and right axis because I haven't
+had time to draw sprites for up and down, but it should work in any direction!
+*/
+
+
 //INTIALISE PLAYER VARIABLES
 let player;
 let playerSprites = {};
