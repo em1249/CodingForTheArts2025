@@ -66,11 +66,12 @@ function preload() {
     //each direction has its own sprites for when walking. Sprite at index 0 is default when still. Any further sprites
     //will be shown in the order they are placed in the array. You could have a default sprite and a seperate walking animation
     //if you wanted, but you would need to modify how my animation code calls a specific index.
-    playerSprites.up = [loadImage("art/starmer_up.png")];
-    playerSprites.down = [loadImage("art/starmer_down.png")];
-    playerSprites.left = [loadImage("art/starmer_left.png"), loadImage("art/starmer_walk_left.png")];
-    playerSprites.right = [loadImage("art/starmer_right.png"), loadImage("art/starmer_walk_right.png")]; 
-
+    playerSprites = {
+        up: [loadImage('art/starmer_up_walk/starmer_up_walk0.png'), loadImage('art/starmer_up_walk/starmer_up_walk1.png'), loadImage('art/starmer_up_walk/starmer_up_walk2.png'), loadImage('art/starmer_up_walk/starmer_up_walk3.png')],
+        down: [loadImage('art/starmer_down_walk/starmer_down_walk0.png'), loadImage('art/starmer_down_walk/starmer_down_walk1.png'), loadImage('art/starmer_down_walk/starmer_down_walk2.png'), loadImage('art/starmer_down_walk/starmer_down_walk3.png')],
+        left: [loadImage('art/starmer_left_walk/starmer_left_walk0.png'), loadImage('art/starmer_left_walk/starmer_left_walk1.png'), loadImage('art/starmer_left_walk/starmer_left_walk2.png'), loadImage('art/starmer_left_walk/starmer_left_walk3.png')],
+        right: [loadImage('art/starmer_right_walk/starmer_right_walk0.png'), loadImage('art/starmer_right_walk/starmer_right_walk1.png'),loadImage('art/starmer_right_walk/starmer_right_walk2.png'),loadImage('art/starmer_right_walk/starmer_right_walk3.png')],
+    }
 }
 
 function setup() {
